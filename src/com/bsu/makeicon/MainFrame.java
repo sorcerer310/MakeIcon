@@ -6,6 +6,7 @@
 package com.bsu.makeicon;
 
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
@@ -36,6 +37,16 @@ public class MainFrame extends javax.swing.JFrame {
         
         //设置拖放窗口
         new DropTarget(p_drag, DnDConstants.ACTION_COPY ,  new ImageDropTargetListener());  
+        
+        try {
+            //设置图标
+//        Image icon = Toolkit.getDefaultToolkit().getImage("16.png");
+//        this.setIconImage(icon);
+            Image icon = ImageIO.read(MainFrame.class.getResource("/img/16.png"));
+            this.setIconImage(icon);
+        } catch (IOException ex) {
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -52,10 +63,11 @@ public class MainFrame extends javax.swing.JFrame {
         bt_openIcon = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("MakeIcon ©FC");
+        setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         p_drag.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         p_drag.setPreferredSize(new java.awt.Dimension(144, 144));
-        p_drag.setSize(new java.awt.Dimension(144, 144));
 
         jLabel7.setForeground(new java.awt.Color(128, 128, 128));
         jLabel7.setText("拖入图标(512*512)");
@@ -67,12 +79,12 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(p_dragLayout.createSequentialGroup()
                 .addGap(55, 55, 55)
                 .addComponent(jLabel7)
-                .addContainerGap(45, Short.MAX_VALUE))
+                .addContainerGap(57, Short.MAX_VALUE))
         );
         p_dragLayout.setVerticalGroup(
             p_dragLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, p_dragLayout.createSequentialGroup()
-                .addContainerGap(65, Short.MAX_VALUE)
+                .addContainerGap(66, Short.MAX_VALUE)
                 .addComponent(jLabel7)
                 .addGap(59, 59, 59))
         );
@@ -88,13 +100,14 @@ public class MainFrame extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(p_drag, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
-                .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(bt_openIcon))
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(p_drag, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(bt_openIcon)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -276,7 +289,6 @@ public class MainFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bt_openIcon;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel p_drag;
     // End of variables declaration//GEN-END:variables
 }
