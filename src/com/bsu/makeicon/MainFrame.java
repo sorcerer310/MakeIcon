@@ -63,7 +63,7 @@ public class MainFrame extends javax.swing.JFrame {
         bt_openIcon = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("MakeIcon ©FC");
+        setTitle("MakeIcon v1.0 ©FC");
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         p_drag.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -164,7 +164,7 @@ public class MainFrame extends javax.swing.JFrame {
             return;
         }
         //生成路径
-        String makepath = png.getParent()+"/makeIcon/";
+        String makepath = png.getParent()+"/icons/";
         File pngpath = new File(makepath);
         boolean b = pngpath.mkdir();
         System.out.println("==========="+b);
