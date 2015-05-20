@@ -14,8 +14,14 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDropEvent;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -35,9 +41,10 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         initComponents();
         
-        //设置拖放窗口
+        //设置图片拖放窗口
         new DropTarget(p_drag, DnDConstants.ACTION_COPY ,  new ImageDropTargetListener());  
-        
+        //设置Properties文件加密拖放窗口
+        new DropTarget(p_drag_pro,DnDConstants.ACTION_COPY,new PropertiesDropTargetListener());
         try {
             //设置图标
 //        Image icon = Toolkit.getDefaultToolkit().getImage("16.png");
@@ -47,6 +54,8 @@ public class MainFrame extends javax.swing.JFrame {
         } catch (IOException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        bt_openIcon.setVisible(false);
     }
 
     /**
@@ -61,16 +70,28 @@ public class MainFrame extends javax.swing.JFrame {
         p_drag = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
         bt_openIcon = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        p_drag_pro = new javax.swing.JPanel();
+        jLabel8 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("MakeIcon v1.0 ©FC");
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        setResizable(false);
 
         p_drag.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         p_drag.setPreferredSize(new java.awt.Dimension(144, 144));
 
         jLabel7.setForeground(new java.awt.Color(128, 128, 128));
         jLabel7.setText("拖入图标(512*512)");
+
+        bt_openIcon.setText("打开图标(512*512)");
+        bt_openIcon.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_openIconActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout p_dragLayout = new javax.swing.GroupLayout(p_drag);
         p_drag.setLayout(p_dragLayout);
@@ -80,42 +101,75 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGap(55, 55, 55)
                 .addComponent(jLabel7)
                 .addContainerGap(57, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, p_dragLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(bt_openIcon))
         );
         p_dragLayout.setVerticalGroup(
             p_dragLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, p_dragLayout.createSequentialGroup()
-                .addContainerGap(66, Short.MAX_VALUE)
+                .addContainerGap(41, Short.MAX_VALUE)
                 .addComponent(jLabel7)
-                .addGap(59, 59, 59))
+                .addGap(49, 49, 49)
+                .addComponent(bt_openIcon)
+                .addContainerGap())
         );
 
-        bt_openIcon.setText("打开图标(512*512)");
-        bt_openIcon.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bt_openIconActionPerformed(evt);
-            }
-        });
+        jLabel1.setText("图标生成");
+
+        jLabel2.setText("Properties加密");
+
+        p_drag_pro.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        p_drag_pro.setPreferredSize(new java.awt.Dimension(144, 144));
+
+        jLabel8.setForeground(new java.awt.Color(128, 128, 128));
+        jLabel8.setText("拖入Properties文件");
+
+        javax.swing.GroupLayout p_drag_proLayout = new javax.swing.GroupLayout(p_drag_pro);
+        p_drag_pro.setLayout(p_drag_proLayout);
+        p_drag_proLayout.setHorizontalGroup(
+            p_drag_proLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, p_drag_proLayout.createSequentialGroup()
+                .addContainerGap(54, Short.MAX_VALUE)
+                .addComponent(jLabel8)
+                .addGap(52, 52, 52))
+        );
+        p_drag_proLayout.setVerticalGroup(
+            p_drag_proLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(p_drag_proLayout.createSequentialGroup()
+                .addGap(63, 63, 63)
+                .addComponent(jLabel8)
+                .addContainerGap(62, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(p_drag, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(bt_openIcon)))
-                .addContainerGap())
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(p_drag, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(p_drag_pro, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(p_drag, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(bt_openIcon)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(10, 10, 10)
+                        .addComponent(p_drag, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addGap(10, 10, 10)
+                        .addComponent(p_drag_pro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -168,7 +222,7 @@ public class MainFrame extends javax.swing.JFrame {
         File pngpath = new File(makepath);
         boolean b = pngpath.mkdir();
         System.out.println("==========="+b);
-        int[] pngsize = {28,32,48,57,72,76,96,100,108,114,120,144,152,175};
+        int[] pngsize = {28,32,36,48,57,72,76,96,100,108,114,120,144,152,175,256};
         
         //生成不同尺寸图标
         for(int i=0;i<pngsize.length;i++){
@@ -179,7 +233,44 @@ public class MainFrame extends javax.swing.JFrame {
             ImageHelper.resizePNG(png, sb.toString(), pngsize[i], pngsize[i], false);
         }
     }
+    /**
+     * 生成加密的Properties
+     * @param f          原始Properties文件
+     * @throws IOException 
+     */
+    private void makeEncryptProperties(File f) throws IOException{
+        try {
+            EncryptedProperties ep = new EncryptedProperties("ugame001");           //加密写入Properties对象
+            Properties p = new Properties();                                        //读取原始文件Properties对象
+
+            FileInputStream fis = new FileInputStream(f);
+            p.load(fis);
+            Set<Map.Entry<Object,Object>> e = p.entrySet();
+            Iterator<Map.Entry<Object,Object>> i = e.iterator();
+            while(i.hasNext()){
+                Map.Entry<Object,Object> entry = i.next();
+                ep.setProperty(entry.getKey().toString(), entry.getValue().toString());
+            }
+            //先生成路径,再生成文件
+            String makepath = f.getParent()+"/encrypt/";
+            File pngpath = new File(makepath);
+            boolean b = pngpath.mkdir();
+            //生成文件
+            File epf = new File(f.getParent()+"/encrypt/"+f.getName());
+            FileOutputStream out = new FileOutputStream(epf);
+            ep.store(out, "encrypt properties");
+            out.close();
+            
+        } catch (Exception ex) {
+            Logger.getLogger(PropertiesHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+    }
     
+    /**
+     * 图片拖放监听器
+     */
     class ImageDropTargetListener extends DropTargetAdapter  
     {  
         public void drop(DropTargetDropEvent event)  
@@ -205,6 +296,7 @@ public class MainFrame extends javax.swing.JFrame {
                         {  
                             //显示每个文件  
 //                            showImage((File)f , event);  
+                            
                             makeImage(((File)f).getPath());
                         }  
                     }  
@@ -249,7 +341,48 @@ public class MainFrame extends javax.swing.JFrame {
         }  
     }
     
-    
+    /**
+     * Properties文件监听器
+     */
+    class PropertiesDropTargetListener extends DropTargetAdapter{
+        public void drop(DropTargetDropEvent event) {
+            //接受复制操作  
+            event.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);  
+            //获取拖放的内容  
+            Transferable transferable = event.getTransferable();  
+            DataFlavor[] flavors = transferable.getTransferDataFlavors();  
+            //遍历拖放内容里的所有数据格式  
+            for (int i = 0; i < flavors.length; i++)  
+            {    
+                DataFlavor d = flavors[i];  
+                try  
+                {  
+                    //如果拖放内容的数据格式是文件列表  
+                    if (d.equals(DataFlavor.javaFileListFlavor))  
+                    {  
+                        //取出拖放操作里的文件列表  
+                        java.util.List fileList   
+                            = (java.util.List) transferable.getTransferData(d);  
+                        for (Object f : fileList)  
+                        {  
+                            //显示每个文件  
+//                            showImage((File)f , event); 
+//                            makeEncryptProperties(((File)f).getPath());
+//                            makeEncryptProperties(f);
+                            makeEncryptProperties(((File)f));
+                        }  
+                    }  
+                }  
+                catch (Exception e)  
+                {    
+                    e.printStackTrace();  
+                }  
+                //强制拖放操作结束，停止阻塞拖放源  
+                event.dropComplete(true);  
+            }  
+        }
+        
+    }
     
     /**
      * @param args the command line arguments
@@ -288,7 +421,11 @@ public class MainFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bt_openIcon;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel p_drag;
+    private javax.swing.JPanel p_drag_pro;
     // End of variables declaration//GEN-END:variables
 }
