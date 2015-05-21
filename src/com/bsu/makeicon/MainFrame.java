@@ -54,8 +54,15 @@ public class MainFrame extends javax.swing.JFrame {
         } catch (IOException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+        //隐藏按钮 
         bt_openIcon.setVisible(false);
+        
+        //-------------properties文件加密部分-----------------
+
+        //设置默认加密
+        bg_properties.add(rb_encrypt);
+        bg_properties.add(rb_decrypt);
+        rb_encrypt.setSelected(true);
     }
 
     /**
@@ -67,6 +74,7 @@ public class MainFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        bg_properties = new javax.swing.ButtonGroup();
         p_drag = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
         bt_openIcon = new javax.swing.JButton();
@@ -74,6 +82,8 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         p_drag_pro = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
+        rb_encrypt = new javax.swing.JRadioButton();
+        rb_decrypt = new javax.swing.JRadioButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("MakeIcon v1.0 ©FC");
@@ -142,6 +152,10 @@ public class MainFrame extends javax.swing.JFrame {
                 .addContainerGap(62, Short.MAX_VALUE))
         );
 
+        rb_encrypt.setText("加密");
+
+        rb_decrypt.setText("解密");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -154,7 +168,12 @@ public class MainFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(p_drag_pro, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addGap(34, 34, 34)
+                        .addComponent(rb_encrypt)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(rb_decrypt)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -167,8 +186,11 @@ public class MainFrame extends javax.swing.JFrame {
                         .addGap(10, 10, 10)
                         .addComponent(p_drag, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addGap(10, 10, 10)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(rb_encrypt)
+                            .addComponent(rb_decrypt))
+                        .addGap(6, 6, 6)
                         .addComponent(p_drag_pro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -239,27 +261,45 @@ public class MainFrame extends javax.swing.JFrame {
      * @throws IOException 
      */
     private void makeEncryptProperties(File f) throws IOException{
+        Properties p_read = null;                                               //负责读取的Properties
+        Properties p_write = null;                                              //负责写入的Properties
+        String savePath = null;
         try {
-            EncryptedProperties ep = new EncryptedProperties("ugame001");           //加密写入Properties对象
-            Properties p = new Properties();                                        //读取原始文件Properties对象
-
+            //选择加密
+            if(this.rb_encrypt.isSelected()){
+                p_write = new EncryptedProperties("ugame001");
+                p_read = new Properties();
+                savePath = "/encrypty/";
+            //选择解密
+            }else if(this.rb_decrypt.isSelected()){
+                p_read = new EncryptedProperties("ugame001");
+                p_write = new Properties();
+                savePath = "/decrypty/";
+            }
+//            EncryptedProperties ep = new EncryptedProperties("ugame001");       //加密写入Properties对象
+//            Properties p = new Properties();                                    //读取原始文件Properties对象
+            //读取文件,并将读入的数据设置到写对象中
             FileInputStream fis = new FileInputStream(f);
-            p.load(fis);
-            Set<Map.Entry<Object,Object>> e = p.entrySet();
+            p_read.load(fis);
+            Set<Map.Entry<Object,Object>> e = p_read.entrySet();
             Iterator<Map.Entry<Object,Object>> i = e.iterator();
             while(i.hasNext()){
                 Map.Entry<Object,Object> entry = i.next();
-                ep.setProperty(entry.getKey().toString(), entry.getValue().toString());
+                String value = p_read.getProperty(entry.getKey().toString());
+                p_write.setProperty(entry.getKey().toString(), value);
             }
+            fis.close();
+            
             //先生成路径,再生成文件
-            String makepath = f.getParent()+"/encrypt/";
+            String makepath = f.getParent()+savePath;
             File pngpath = new File(makepath);
             boolean b = pngpath.mkdir();
             //生成文件
-            File epf = new File(f.getParent()+"/encrypt/"+f.getName());
-            FileOutputStream out = new FileOutputStream(epf);
-            ep.store(out, "encrypt properties");
+            File f_write = new File(f.getParent()+savePath+f.getName());
+            FileOutputStream out = new FileOutputStream(f_write);
+            p_write.store(out, "encrypt properties");
             out.close();
+            
             
         } catch (Exception ex) {
             Logger.getLogger(PropertiesHelper.class.getName()).log(Level.SEVERE, null, ex);
@@ -420,6 +460,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup bg_properties;
     private javax.swing.JButton bt_openIcon;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -427,5 +468,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel p_drag;
     private javax.swing.JPanel p_drag_pro;
+    private javax.swing.JRadioButton rb_decrypt;
+    private javax.swing.JRadioButton rb_encrypt;
     // End of variables declaration//GEN-END:variables
 }
