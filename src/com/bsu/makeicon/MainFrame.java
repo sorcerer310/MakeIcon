@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -55,7 +56,7 @@ public class MainFrame extends javax.swing.JFrame {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
         //隐藏按钮 
-        bt_openIcon.setVisible(false);
+//        bt_openIcon.setVisible(false);
         
         //-------------properties文件加密部分-----------------
 
@@ -77,7 +78,6 @@ public class MainFrame extends javax.swing.JFrame {
         bg_properties = new javax.swing.ButtonGroup();
         p_drag = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
-        bt_openIcon = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         p_drag_pro = new javax.swing.JPanel();
@@ -86,7 +86,7 @@ public class MainFrame extends javax.swing.JFrame {
         rb_decrypt = new javax.swing.JRadioButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("MakeIcon v1.0 ©FC");
+        setTitle("MakeIcon v2.1 ©FC");
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         setResizable(false);
 
@@ -96,33 +96,21 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel7.setForeground(new java.awt.Color(128, 128, 128));
         jLabel7.setText("拖入图标(512*512)");
 
-        bt_openIcon.setText("打开图标(512*512)");
-        bt_openIcon.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bt_openIconActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout p_dragLayout = new javax.swing.GroupLayout(p_drag);
         p_drag.setLayout(p_dragLayout);
         p_dragLayout.setHorizontalGroup(
             p_dragLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(p_dragLayout.createSequentialGroup()
-                .addGap(55, 55, 55)
-                .addComponent(jLabel7)
-                .addContainerGap(57, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, p_dragLayout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(bt_openIcon))
+                .addContainerGap(58, Short.MAX_VALUE)
+                .addComponent(jLabel7)
+                .addGap(54, 54, 54))
         );
         p_dragLayout.setVerticalGroup(
             p_dragLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, p_dragLayout.createSequentialGroup()
-                .addContainerGap(41, Short.MAX_VALUE)
+            .addGroup(p_dragLayout.createSequentialGroup()
+                .addGap(63, 63, 63)
                 .addComponent(jLabel7)
-                .addGap(49, 49, 49)
-                .addComponent(bt_openIcon)
-                .addContainerGap())
+                .addContainerGap(62, Short.MAX_VALUE))
         );
 
         jLabel1.setText("图标生成");
@@ -198,36 +186,6 @@ public class MainFrame extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-
-    private void bt_openIconActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_openIconActionPerformed
-        JFileChooser jc_icon = new JFileChooser();
-        jc_icon.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        
-        jc_icon.setFileFilter(new FileFilter(){
-
-            @Override
-            public boolean accept(File f) {
-                String tmp = f.getName().toLowerCase();
-                if(tmp.endsWith(".png") || f.isDirectory())
-                    return true;
-                return false;
-            }
-
-            @Override
-            public String getDescription() {
-                return "png文件";
-            }
-        });
-        
-        int index = jc_icon.showDialog(null, "选择图标");
-        if(index==JFileChooser.APPROVE_OPTION){
-            try {
-                makeImage(jc_icon.getSelectedFile().getPath());
-            } catch (IOException ex) {
-                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }//GEN-LAST:event_bt_openIconActionPerformed
     /**
      * 通过导入的图标生成所有尺寸的图标
      * @param path 源图标的路径
@@ -244,14 +202,25 @@ public class MainFrame extends javax.swing.JFrame {
         File pngpath = new File(makepath);
         boolean b = pngpath.mkdir();
         System.out.println("==========="+b);
-        int[] pngsize = {28,32,36,48,57,72,76,96,100,108,114,120,144,152,175,256};
+        int[] pngsize = {28,32,36,48,57,72,76,96,100,108,114,120,144,152,175,256};  //设置所有的尺寸
+        HashMap<Integer,String> hm = new HashMap<Integer,String>();             //根据不同的尺寸为不同的文件命名
+        hm.put(57, "Icon");
+        hm.put(114, "Icon@2x");
+        hm.put(72, "Icon-72");
+        hm.put(144, "Icon-72@2x");
+        hm.put(120, "Icon-60@2x");
+        hm.put(76, "Icon-76");
+        hm.put(152, "Icon-76@2x");
         
         //生成不同尺寸图标
         for(int i=0;i<pngsize.length;i++){
             StringBuilder sb = new StringBuilder();
-            sb.append(makepath)
-                    .append(Integer.toString(pngsize[i]))
-                    .append(".png");
+            sb.append(makepath);
+            if(hm.containsKey(pngsize[i]))
+                sb.append(hm.get(pngsize[i]));
+            else
+                sb.append(Integer.toString(pngsize[i]));
+            sb.append(".png");
             ImageHelper.resizePNG(png, sb.toString(), pngsize[i], pngsize[i], false);
         }
     }
@@ -461,7 +430,6 @@ public class MainFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bg_properties;
-    private javax.swing.JButton bt_openIcon;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel7;
