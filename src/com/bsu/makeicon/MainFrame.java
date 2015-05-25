@@ -86,7 +86,7 @@ public class MainFrame extends javax.swing.JFrame {
         rb_decrypt = new javax.swing.JRadioButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("MakeIcon v2.1 ©FC");
+        setTitle("MakeIcon v2.2 ©FC");
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         setResizable(false);
 
@@ -197,33 +197,74 @@ public class MainFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(MainFrame.this, "您选择的图标尺寸不合适，请选择512*512尺寸的图标");
             return;
         }
-        //生成路径
-        String makepath = png.getParent()+"/icons/";
-        File pngpath = new File(makepath);
-        boolean b = pngpath.mkdir();
-        System.out.println("==========="+b);
-        int[] pngsize = {28,32,36,48,57,72,76,96,100,108,114,120,144,152,175,256};  //设置所有的尺寸
-        HashMap<Integer,String> hm = new HashMap<Integer,String>();             //根据不同的尺寸为不同的文件命名
-        hm.put(57, "Icon");
-        hm.put(114, "Icon@2x");
-        hm.put(72, "Icon-72");
-        hm.put(144, "Icon-72@2x");
-        hm.put(120, "Icon-60@2x");
-        hm.put(76, "Icon-76");
-        hm.put(152, "Icon-76@2x");
+        //生成路径一些保存图标的若干路径
+        String makePath = png.getParent()+"/icons/";
+        makeFolders(makePath);
+        String makeIosPath = png.getParent()+"/icons/ios/";
+        makeFolders(makeIosPath);
+        String makeAndroidPath = png.getParent()+"/icons/android/";
+        makeFolders(makeAndroidPath);
+
+        int[] pngsize = {28,32,36,48,57,72,76,96,100,108,114,120,144,152,175,192,256};  //设置所有的尺寸
+        
+        HashMap<Integer,String> hm_ios = new HashMap<Integer,String>();             //ios根据不同的尺寸为不同的文件命名
+        hm_ios.put(57, "Icon");
+        hm_ios.put(114, "Icon@2x");
+        hm_ios.put(72, "Icon-72");
+        hm_ios.put(144, "Icon-72@2x");
+        hm_ios.put(120, "Icon-60@2x");
+        hm_ios.put(76, "Icon-76");
+        hm_ios.put(152, "Icon-76@2x");
+        
+        HashMap<Integer,String> hm_android = new HashMap<Integer,String>();     //android根据不同尺寸为不同的图标设置保存路径
+        hm_android.put(48, "drawable-mdpi");
+        hm_android.put(72, "drawable-hdpi");
+        hm_android.put(96, "drawable-xhdpi");
+        hm_android.put(144, "drawable-xxhdpi");
+        hm_android.put(192, "drawable-xxxhdpi");
+        
         
         //生成不同尺寸图标
         for(int i=0;i<pngsize.length;i++){
+            //生成以尺寸命名的图标文件
             StringBuilder sb = new StringBuilder();
-            sb.append(makepath);
-            if(hm.containsKey(pngsize[i]))
-                sb.append(hm.get(pngsize[i]));
-            else
-                sb.append(Integer.toString(pngsize[i]));
-            sb.append(".png");
-            ImageHelper.resizePNG(png, sb.toString(), pngsize[i], pngsize[i], false);
+            sb.append(makePath)
+                    .append(Integer.toString(pngsize[i])) 
+                    .append(".png"); 
+                    
+            ImageHelper.resizePNG(png, sb.toString(), pngsize[i], pngsize[i], false); 
+
+            //如果当前包含符合ios尺寸的图标.
+            if(hm_ios.containsKey(pngsize[i])){
+                sb = new StringBuilder();
+                sb.append(makeIosPath)
+                        .append(hm_ios.get(pngsize[i]))
+                        .append(".png");
+                ImageHelper.resizePNG(png, sb.toString(), pngsize[i], pngsize[i], false);
+            }
+            
+            //如果当前包含符合android尺寸的图标.
+            if(hm_android.containsKey(pngsize[i])){
+                sb = new StringBuilder();
+                sb.append(makeAndroidPath)
+                        .append(hm_android.get(pngsize[i]))
+                        .append("/");
+                makeFolders(sb.toString());
+                sb.append("ic_launcher.png");
+                ImageHelper.resizePNG(png, sb.toString(), pngsize[i], pngsize[i], false);
+            }
         }
     }
+    /**
+     * 根据路径创建文件夹
+     * @param path  路径名
+     */
+    private void makeFolders(String path){
+        File f = new File(path);
+        f.mkdir();
+        f = null;
+    }
+    
     /**
      * 生成加密的Properties
      * @param f          原始Properties文件
