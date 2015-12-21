@@ -193,8 +193,8 @@ public class MainFrame extends javax.swing.JFrame {
     private void makeImage(String path) throws IOException{
         File png = new File(path);
         int[] size = ImageHelper.getPNGSize(png);
-        if(size[0]!=512 || size[1]!=512){
-            JOptionPane.showMessageDialog(MainFrame.this, "您选择的图标尺寸不合适，请选择512*512尺寸的图标");
+        if((size[0]!=512 || size[1]!=512) && (size[0]!=256 || size[1]!=256)){
+            JOptionPane.showMessageDialog(MainFrame.this, "您选择的图标尺寸不合适，请选择512*512或256*256尺寸的图标");
             return;
         }
         //生成路径一些保存图标的若干路径
